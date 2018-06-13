@@ -1,73 +1,71 @@
 <template>
   <section id="woonkly-country-selection" class="section">
     <div class="container">
-      <div class="level">
-        <div class="columns">
-          <form class="column" @submit.prevent="submitForm">
-            <div class="field">
-              <label class="label">Bienvenido!</label>
-              <div class="control">
-                <input class="input" type="text" placeholder="Text input" :value="userName" disabled>
+      <div class="columns">
+        <form class="column is-one-third-tablet is-8-desktop" @submit.prevent="submitForm">
+          <div class="field">
+            <label class="label">Bienvenido!</label>
+            <div class="control">
+              <input class="input" type="text" placeholder="Text input" :value="userName" disabled>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">País #1</label>
+            <div class="control">
+              <div class="select">
+                <select v-model="selectedCountries[0]">
+                  <option value="null" disabled selected>Seleccione...</option>
+                  <option v-for="c in countriesArray" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                </select>
               </div>
             </div>
+          </div>
 
-            <div class="field">
-              <label class="label">País #1</label>
-              <div class="control">
-                <div class="select">
-                  <select v-model="selectedCountries[0]">
-                    <option value="null" disabled selected>Seleccione...</option>
-                    <option v-for="c in countriesArray" :disabled="selectedCountries.includes(c)">{{c}}</option>
-                  </select>
-                </div>
+          <div class="field">
+            <label class="label">País #2</label>
+            <div class="control">
+              <div class="select">
+                <select v-model="selectedCountries[1]">
+                  <option value="null" disabled selected>Seleccione...</option>
+                  <option v-for="c in countriesArray" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                </select>
               </div>
             </div>
+          </div>
 
-            <div class="field">
-              <label class="label">País #2</label>
-              <div class="control">
-                <div class="select">
-                  <select v-model="selectedCountries[1]">
-                    <option value="null" disabled selected>Seleccione...</option>
-                    <option v-for="c in countriesArray" :disabled="selectedCountries.includes(c)">{{c}}</option>
-                  </select>
-                </div>
+          <div class="field">
+            <label class="label">País #3</label>
+            <div class="control">
+              <div class="select">
+                <select v-model="selectedCountries[2]">
+                  <option value="null" disabled selected>Seleccione...</option>
+                  <option v-for="c in countriesArray" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                </select>
               </div>
             </div>
+          </div>
 
-            <div class="field">
-              <label class="label">País #3</label>
-              <div class="control">
-                <div class="select">
-                  <select v-model="selectedCountries[2]">
-                    <option value="null" disabled selected>Seleccione...</option>
-                    <option v-for="c in countriesArray" :disabled="selectedCountries.includes(c)">{{c}}</option>
-                  </select>
-                </div>
-              </div>
+          <!-- <div class="field">
+            <label class="label">Message</label>
+            <div class="control">
+              <textarea class="textarea" placeholder="Textarea"></textarea>
             </div>
+          </div> -->
 
-            <!-- <div class="field">
-              <label class="label">Message</label>
-              <div class="control">
-                <textarea class="textarea" placeholder="Textarea"></textarea>
-              </div>
-            </div> -->
-
-            <div class="field">
-              <div class="control">
-                <label class="checkbox">
-                  <input type="checkbox" v-model="termsAndConditions">
-                  Acepto los <a href="#">términos y condiciones.</a>
-                </label>
-              </div>
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" v-model="termsAndConditions">
+                Acepto los <a href="#">términos y condiciones.</a>
+              </label>
             </div>
+          </div>
 
-            <div class="buttons">
-              <button class="button w-100 is-link is-marginless is-block">Enviar</button>
-            </div>
-          </form>
-        </div>
+          <div class="buttons">
+            <button class="button w-100 is-link is-marginless is-block">Enviar</button>
+          </div>
+        </form>
       </div>
     </div>
   </section>
@@ -109,11 +107,14 @@ export default {
   }
 }
 
-// Desktop styles
+// mobile-only styles
 @media only screen and (max-width: 1024px) {
   #woonkly-country-selection {
-    height: calc(100vh - 52px);
+    min-height: calc(100vh - 52px);
     box-sizing: border-box;
+    .columns > form {
+      margin: auto;
+    }
   }
 }
 </style>
