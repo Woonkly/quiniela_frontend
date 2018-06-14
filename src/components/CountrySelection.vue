@@ -3,9 +3,9 @@
     <div class="container">
 
       <transition name="shrink">
-        <div v-show="!termsAndConditions" class="level" style="transition-delay: 600ms">
+        <div v-show="!showForm" class="level" style="transition-delay: 600ms">
           <div class="columns">
-            <div id="terms-and-conditions" class="column column is-one-third-tablet is-8-desktop">
+            <div id="terms-and-conditions" class="column column is-one-third-tablet is-8-desktop mx-auto">
               <h1 class="title is-3">Términos y condiciones</h1>
               <div class="wrapper">
                 <p>
@@ -49,16 +49,25 @@
       </transition>
 
       <transition name="shrink">
-        <div v-show="termsAndConditions" class="columns" style="transition-delay: 1420ms">
+        <div v-show="showForm" class="columns" style="transition-delay: 1420ms">
           <form class="column is-one-third-tablet is-8-desktop" @submit.prevent="submitForm">
+
             <div class="field">
               <label class="label">Bienvenido!</label>
               <div class="control">
-                <input class="input" type="text" placeholder="Text input" :value="userName" disabled>
+                <span>{{user.name}}</span>
+              </div>
+            </div>
+
+            <div id="smartcontract-password" class="field">
+              <label class="label">Clave de acceso</label>
+              <div class="control">
+                <input class="input" type="password" placeholder="ContraseñaSegura123" v-model="password" >
               </div>
             </div>
 
             <div class="field">
+              <label class="label">Paises ganadores</label>
               <div class="control">
                 <div class="select">
                   <select v-model="selectedCountries[0]">
@@ -110,34 +119,115 @@
             <div class="buttons">
               <button class="button w-100 is-link is-marginless is-block">Enviar</button>
             </div>
+
+            <div class="columns">
+              <div class="column is-4-mobile">
+                <woonkzalo-flag v-if="selectedCountries[0]" :country="countriesArray.indexOf(selectedCountries[0])" :position="1" />
+              </div>
+              <div class="column is-4-mobile">
+                <woonkzalo-flag v-if="selectedCountries[1]" :country="countriesArray.indexOf(selectedCountries[1])" :position="2" />
+              </div>
+              <div class="column is-4-mobile">
+                <woonkzalo-flag v-if="selectedCountries[2]" :country="countriesArray.indexOf(selectedCountries[2])" :position="3" />
+              </div>
+            </div>
           </form>
         </div>
       </transition>
+
+      <div v-show="errorMsg" class="columns">
+        <div class="column column is-6-tablet mx-auto">
+          <div class="notification is-danger">
+            <button @click="errorMsg = null" class="delete"></button>
+            {{errorMsg}}
+          </div>
+        </div>
+      </div>
+
+
+      <div v-show="successMessage" class="columns">
+        <div class="column column is-6-tablet mx-auto">
+          <div v-show="successMessage" class="notification is-success">
+            <button @click="successMessage = null" class="delete"></button>
+            {{successMessage}}
+          </div>
+        </div>
+      </div>
 
     </div>
   </section>
 </template>
 
 <script>
+import woonkzaloFlag from '@/components/unit/WoonkzaloFlag'
 import wCheckbox from '@/components/unit/WoonklyCheckbox'
 
 export default {
   name: 'CountrySelection',
   data () {
     return {
-      userName: 'Juan Peréz',
+      user: {
+        name: null
+      },
+      password: null,
       termsAndConditions: false,
+      isUserAuth: false,
+      successMessage: null,
+      errorMsg: null,
       selectedCountries: [
         null, null, null
       ],
       countriesArray: 'ALEMANIA,ARABIA SAUDÍ,ARGENTINA,AUSTRALIA,BÉLGICA,BRASIL,COLOMBIA,COSTA RICA,CROACIA,DINAMARCA,EGIPTO,ESPAÑA,FRANCIA,INGLATERRA,ISLANDIA,JAPÓN,MARRUECOS,MÉXICO,NIGERIA,PANAMÁ,PERÚ,POLONIA,PORTUGAL,REPÚBLICA DE COREA,RI DE IRÁN,RUSIA,SENEGAL,SERBIA,SUECIA,SUIZA,TÚNEZ,URUGUAY'.split(',')
     }
   },
+  computed: {
+    showForm () {
+      return this.isUserAuth && this.termsAndConditions
+    }
+  },
   methods: {
-    submitForm () {
-      if ( !this.selectedCountries.includes(null) && this.termsAndConditions) {
-        let { userName: name, selectedCountries: contries } = this
-        console.log(`name: ${name}, countries: ${contries}`)
+    fetchUser () {
+      fetch(`${process.env.BASE_URL}/api/user/${this.$route.params.hash}`, {
+        method: 'GET'
+      }).then(res => {
+        if (res.ok) {
+          this.isUserAuth = true
+          return res.json()
+        } else {
+          this.errorMsg = 'Usted no está autorizado para acceder a este sitio.'
+        }
+      })
+      .then(json => {
+        this.user = json
+      })
+      .catch(error => { console.error(error) })
+    },
+    submitForm (e) {
+      if (!this.selectedCountries.includes(null) && this.termsAndConditions) {
+        let { user, selectedCountries: contries } = this
+        let requestBody = {
+          countries: [
+            { team : contries[0], place: 1 },
+            { team : contries[1], place: 2 },
+            { team : contries[2], place: 3 }
+          ]
+        }
+        fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type' : 'application/json' },
+          body: JSON.stringify(requestBody)
+        })
+        .then(res => {
+          if (res.ok) {
+            this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
+          } else {
+            this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
+          }
+        })
+        .catch(err => {
+          this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
+          console.error(err)
+        })
       } else {
         console.log('Something is missing in the form')
         // TODO: Notify the user that something is incomplete
@@ -145,7 +235,11 @@ export default {
     }
   },
   components: {
-    wCheckbox
+    wCheckbox,
+    woonkzaloFlag
+  },
+  mounted () {
+    this.fetchUser()
   }
 }
 </script>
@@ -167,6 +261,10 @@ export default {
     .woonkly-checkbox {
       margin-top: 1.5em;
     }
+  }
+
+  #smartcontract-password {
+    margin-bottom: 2em;
   }
 
   .columns > form {

@@ -32,6 +32,19 @@ export default {
   opacity: 1;
 }
 
+// Fade in from bottom
+.fade-bottom-enter-active, .fade-bottom-leave-active {
+  transition: transform 300ms ease, opacity 400ms ease;
+}
+.fade-bottom-enter, .fade-bottom-leave-to {
+  transform: translateY(2em);
+  opacity: 0;
+}
+.fade-bottom-enter-to, .fade-bottom-leave {
+  transform: translateY(0em);
+  opacity: 1;
+}
+
 // Helper classes
 .c-pointer {
   cursor: pointer !important;
@@ -43,5 +56,10 @@ export default {
 
 .w-100 {
   width: 100% !important;
+}
+
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 </style>
