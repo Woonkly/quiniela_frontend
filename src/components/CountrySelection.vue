@@ -49,7 +49,7 @@
       </transition>
 
       <transition name="shrink">
-        <div v-show="showForm" class="columns" style="transition-delay: 1420ms">
+        <div v-show="showForm && !isFormCompleted" class="columns" style="transition-delay: 1420ms">
           <form class="column is-one-third-tablet is-8-desktop" @submit.prevent="submitForm">
 
             <div class="field">
@@ -120,14 +120,14 @@
               <button class="button w-100 is-link is-marginless is-block">Enviar</button>
             </div>
 
-            <div class="columns">
-              <div class="column is-4-mobile">
+            <div class="columns is-mobile">
+              <div class="column is-4">
                 <woonkzalo-flag v-if="selectedCountries[0]" :country="countriesArray.indexOf(selectedCountries[0])" :position="1" />
               </div>
-              <div class="column is-4-mobile">
+              <div class="column is-4">
                 <woonkzalo-flag v-if="selectedCountries[1]" :country="countriesArray.indexOf(selectedCountries[1])" :position="2" />
               </div>
-              <div class="column is-4-mobile">
+              <div class="column is-4">
                 <woonkzalo-flag v-if="selectedCountries[2]" :country="countriesArray.indexOf(selectedCountries[2])" :position="3" />
               </div>
             </div>
@@ -174,6 +174,7 @@ export default {
       isUserAuth: false,
       successMessage: null,
       errorMsg: null,
+      isFormCompleted: false,
       selectedCountries: [
         null, null, null
       ],
@@ -204,12 +205,12 @@ export default {
     },
     submitForm (e) {
       if (!this.selectedCountries.includes(null) && this.termsAndConditions) {
-        let { user, selectedCountries: contries } = this
+        let { user, selectedCountries: countries } = this
         let requestBody = {
           countries: [
-            { team : contries[0], place: 1 },
-            { team : contries[1], place: 2 },
-            { team : contries[2], place: 3 }
+            { team : countries[0], place: 1 },
+            { team : countries[1], place: 2 },
+            { team : countries[2], place: 3 }
           ]
         }
         fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
@@ -220,6 +221,7 @@ export default {
         .then(res => {
           if (res.ok) {
             this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
+            this.isFormCompleted = true
           } else {
             this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
           }
