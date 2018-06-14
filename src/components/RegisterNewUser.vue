@@ -32,7 +32,7 @@
               <input :value="woonklyUrl" class="input" type="text" placeholder="http://alksjdlaksjxlkasdlkad.com/128730123ey7rtwqiasdyuxghcvasiudgha" readonly>
             </div>
             <div class="control">
-              <button class="button is-info">Copiar</button>
+              <a class="button is-info" v-clipboard:copy="woonklyUrl" v-clipboard:success="copySuccess" v-clipboard:error="errorOnCopy">{{copyLabel}}</a>
             </div>
           </div>
           <!-- Generated Link -->
@@ -51,6 +51,7 @@ export default {
   name: 'RegisterNewUser',
   data () {
     return {
+      copyLabel: 'Copiar',
       form: {
         name: null,
         email: null
@@ -75,8 +76,16 @@ export default {
           this.userGeneratedID = json['_id']
         })
         .catch(error => console.log(error))
+    },
+    copySuccess () {
+      console.log('Copiado con exito!')
+      this.copyLabel = '¡Copiado!'
+      setTimeout(() => { this.copyLabel = 'Copiar' }, 3000)
+    },
+    errorOnCopy (e) {
+      console.error('Error on copy', e)
     }
-  }
+  },
 }
 </script>
 
