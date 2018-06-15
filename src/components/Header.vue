@@ -22,7 +22,7 @@ export default {}
 
 <style lang="scss">
 .navbar {
-    background-color: purple;
+    background-color: #08639f;
     .navbar-burger {
         span {
             background: white;
