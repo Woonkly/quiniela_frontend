@@ -148,7 +148,7 @@ import wCheckbox from '@/components/unit/WoonklyCheckbox'
 
 export default {
   name: 'CountrySelection',
-  data() {
+  data () {
     return {
       user: {
         name: null
@@ -173,15 +173,15 @@ export default {
   methods: {
     fetchUser () {
       fetch(`${process.env.BASE_URL}/api/user/${this.$route.params.hash}`, {
-          method: 'GET'
-        }).then(res => {
-          if (res.ok) {
-            this.isUserAuth = true
-            return res.json()
-          } else {
-            this.errorMsg = 'Usted no está autorizado para acceder a este sitio.'
-          }
-        })
+        method: 'GET'
+      }).then(res => {
+        if (res.ok) {
+          this.isUserAuth = true
+          return res.json()
+        } else {
+          this.errorMsg = 'Usted no está autorizado para acceder a este sitio.'
+        }
+      })
         .then(json => {
           this.user = json
         })
@@ -197,26 +197,23 @@ export default {
         } = this
         let requestBody = {
           countries: [{
-              team: countries[0],
-              place: 1
-            },
-            {
-              team: countries[1],
-              place: 2
-            },
-            {
-              team: countries[2],
-              place: 3
-            }
-          ]
+            team: countries[0],
+            place: 1
+          },
+          {
+            team: countries[1],
+            place: 2
+          },
+          {
+            team: countries[2],
+            place: 3
+          }]
         }
         fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-          })
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        })
           .then(res => {
             if (res.ok) {
               this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
@@ -239,7 +236,7 @@ export default {
     wCheckbox,
     woonkzaloFlag
   },
-  mounted() {
+  mounted () {
     this.fetchUser()
   }
 }
