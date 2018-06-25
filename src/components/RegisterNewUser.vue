@@ -69,7 +69,7 @@ export default {
     registerYoutuber () {
       fetch(`${process.env.BASE_URL}/api/user`, {
         method: 'POST',
-        headers: { 'Content-Type' : 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.form)
       }).then(res => res.json())
         .then(json => {
@@ -85,7 +85,7 @@ export default {
     errorOnCopy (e) {
       console.error('Error on copy', e)
     }
-  },
+  }
 }
 </script>
 
