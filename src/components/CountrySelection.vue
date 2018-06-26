@@ -85,22 +85,6 @@
               </div>
             </div>
 
-            <!-- <div class="field">
-              <label class="label">Message</label>
-              <div class="control">
-                <textarea class="textarea" placeholder="Textarea"></textarea>
-              </div>
-            </div> -->
-
-            <!-- <div class="field">
-              <div class="control">
-                <label class="checkbox">
-                  <input type="checkbox" v-model="termsAndConditions">
-                  Acepto los <a href="#">términos y condiciones.</a>
-                </label>
-              </div>
-            </div> -->
-
             <div class="buttons">
               <button class="button w-100 is-link is-marginless is-block">Enviar</button>
             </div>
