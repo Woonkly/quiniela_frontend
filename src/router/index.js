@@ -9,7 +9,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/countries/:hash',
+      path: '/gamble/:hash',
       component: ContrySelection
     },
     {
