@@ -127,16 +127,20 @@
 </template>
 
 <script>
+import { web3PresentAndValidated } from '@/utils/web3Validator'
 import woonkzaloFlag from '@/components/unit/WoonkzaloFlag'
 import wCheckbox from '@/components/unit/WoonklyCheckbox'
+import countriesTable from '@/assets/countriesTable'
 
 export default {
   name: 'CountrySelection',
   data () {
     return {
       user: {
-        name: null
+        name: null,
+        account: null
       },
+      web3Validated: true,
       password: null,
       termsAndConditions: false,
       isUserAuth: false,
@@ -146,6 +150,8 @@ export default {
       selectedCountries: [
         null, null, null
       ],
+      contriesCodes: [],
+      mappedCountries: countriesTable,
       countriesArray: 'ALEMANIA,ARABIA SAUDÍ,ARGENTINA,AUSTRALIA,BÉLGICA,BRASIL,COLOMBIA,COSTA RICA,CROACIA,DINAMARCA,EGIPTO,ESPAÑA,FRANCIA,INGLATERRA,ISLANDIA,JAPÓN,MARRUECOS,MÉXICO,NIGERIA,PANAMÁ,PERÚ,POLONIA,PORTUGAL,REPÚBLICA DE COREA,RI DE IRÁN,RUSIA,SENEGAL,SERBIA,SUECIA,SUIZA,TÚNEZ,URUGUAY'.split(',')
     }
   },
@@ -171,6 +177,15 @@ export default {
         })
         .catch(error => {
           console.error(error)
+        })
+    },
+    fetchCountries () {
+      fetch(`${process.env.BASE_URL}/api/equipos`, {
+        method: 'GET',
+      })
+        .then(res => res.json())
+        .then(json => {
+          this.contriesCodes = json
         })
     },
     submitForm (e) {
@@ -222,6 +237,12 @@ export default {
   },
   mounted () {
     this.fetchUser()
+    web3PresentAndValidated((res) => {
+      if (!res) { this.web3Validated = false }
+    },
+    (acc) => {
+      this.user.account = acc
+    })
   }
 }
 </script>
