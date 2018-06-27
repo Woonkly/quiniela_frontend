@@ -57,7 +57,7 @@
                 <div class="select">
                   <select v-model="selectedCountries[0]">
                     <option value="null" disabled selected>Primer lugar</option>
-                    <option v-for="c in countriesArray" :key="c" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                    <option v-for="c in contriesCodes" :key="c.country" :disabled="selectedCountries.includes(c.number)" :value="c.number">{{mappedCountries[c.country]}}</option>
                   </select>
                 </div>
               </div>
@@ -68,7 +68,7 @@
                 <div class="select">
                   <select v-model="selectedCountries[1]">
                     <option value="null" disabled selected>Segundo lugar</option>
-                    <option v-for="c in countriesArray" :key="c" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                    <option v-for="c in contriesCodes" :key="c.country" :disabled="selectedCountries.includes(c.number)" :value="c.number">{{mappedCountries[c.country]}}</option>
                   </select>
                 </div>
               </div>
@@ -79,7 +79,7 @@
                 <div class="select">
                   <select v-model="selectedCountries[2]">
                     <option value="null" disabled selected>Tercer lugar</option>
-                    <option v-for="c in countriesArray" :key="c" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                    <option v-for="c in contriesCodes" :key="c.country" :disabled="selectedCountries.includes(c.number)" :value="c.number">{{mappedCountries[c.country]}}</option>
                   </select>
                 </div>
               </div>
@@ -91,13 +91,13 @@
 
             <div class="columns is-mobile">
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[0]" :country="countriesArray.indexOf(selectedCountries[0])" :position="1" />
+                <woonkzalo-flag v-if="selectedCountries[0]" :country="selectedCountries[0]" :position="1" />
               </div>
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[1]" :country="countriesArray.indexOf(selectedCountries[1])" :position="2" />
+                <woonkzalo-flag v-if="selectedCountries[1]" :country="selectedCountries[1]" :position="2" />
               </div>
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[2]" :country="countriesArray.indexOf(selectedCountries[2])" :position="3" />
+                <woonkzalo-flag v-if="selectedCountries[2]" :country="selectedCountries[2]" :position="3" />
               </div>
             </div>
           </form>
@@ -131,6 +131,11 @@ import { web3PresentAndValidated } from '@/utils/web3Validator'
 import woonkzaloFlag from '@/components/unit/WoonkzaloFlag'
 import wCheckbox from '@/components/unit/WoonklyCheckbox'
 import countriesTable from '@/assets/countriesTable'
+import temporalCountriesArray from '@/assets/temporalResponse'
+import contractABI from '@/assets/contractAbi'
+
+let woonklyContract = null
+let localWeb3 = null
 
 export default {
   name: 'CountrySelection',
@@ -150,7 +155,7 @@ export default {
       selectedCountries: [
         null, null, null
       ],
-      contriesCodes: [],
+      contriesCodes: temporalCountriesArray,
       mappedCountries: countriesTable,
       countriesArray: 'ALEMANIA,ARABIA SAUDÍ,ARGENTINA,AUSTRALIA,BÉLGICA,BRASIL,COLOMBIA,COSTA RICA,CROACIA,DINAMARCA,EGIPTO,ESPAÑA,FRANCIA,INGLATERRA,ISLANDIA,JAPÓN,MARRUECOS,MÉXICO,NIGERIA,PANAMÁ,PERÚ,POLONIA,PORTUGAL,REPÚBLICA DE COREA,RI DE IRÁN,RUSIA,SENEGAL,SERBIA,SUECIA,SUIZA,TÚNEZ,URUGUAY'.split(',')
     }
@@ -161,6 +166,19 @@ export default {
     }
   },
   methods: {
+    createContractInstance () {
+      localWeb3 = new Web3(window.web3.currentProvider)
+      localWeb3.eth.defaultAccount = this.user.account
+
+      // declare woonkly contract ABI
+      var woonklyContractAbi = localWeb3.eth.contract(contractABI)
+      console.log(woonklyContractAbi)
+
+
+      woonklyContract = woonklyContractAbi.at('0xc342ec0D39adA78023B23F17bd6C7C3f655dee98')
+
+      console.log(woonklyContract)
+    },
     fetchUser () {
       fetch(`${process.env.BASE_URL}/api/user/${this.$route.params.hash}`, {
         method: 'GET'
@@ -181,7 +199,7 @@ export default {
     },
     fetchCountries () {
       fetch(`${process.env.BASE_URL}/api/equipos`, {
-        method: 'GET',
+        method: 'GET'
       })
         .then(res => res.json())
         .then(json => {
@@ -208,23 +226,24 @@ export default {
             place: 3
           }]
         }
-        fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
-        })
-          .then(res => {
-            if (res.ok) {
-              this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
-              this.isFormCompleted = true
-            } else {
-              this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
-            }
-          })
-          .catch(err => {
-            this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
-            console.error(err)
-          })
+
+        // fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
+        //   method: 'PUT',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(requestBody)
+        // })
+        //   .then(res => {
+        //     if (res.ok) {
+        //       this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
+        //       this.isFormCompleted = true
+        //     } else {
+        //       this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
+        //     }
+        //   })
+        //   .catch(err => {
+        //     this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
+        //     console.error(err)
+        //   })
       } else {
         console.log('Something is missing in the form')
         // TODO: Notify the user that something is incomplete
@@ -239,6 +258,9 @@ export default {
     this.fetchUser()
     web3PresentAndValidated((res) => {
       if (!res) { this.web3Validated = false }
+      else {
+        this.createContractInstance()
+      }
     },
     (acc) => {
       this.user.account = acc
