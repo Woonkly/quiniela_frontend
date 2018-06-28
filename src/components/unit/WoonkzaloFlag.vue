@@ -5,7 +5,7 @@
       <div class="img-wrapper">
         <img src="/static/woonkzalo.png" alt="Woonkzalo" class="is-invisible">
         <img src="/static/woonkzalo.png" alt="Woonkzalo" class="actual-woonkzalo">
-        <img :src="`/static/flags/${country}.png`" alt="Country Flag" class="flag">
+        <img :src="`/static/flags/new_order/${country}.png`" alt="Country Flag" class="flag">
       </div>
     </div>
   </transition>
