@@ -91,13 +91,13 @@
 
             <div class="columns is-mobile">
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[0]" :country="selectedCountries[0]" :position="1" />
+                <woonkzalo-flag v-if="selectedCountries[0]" :country="selectedCountries[0]-1" :position="1" />
               </div>
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[1]" :country="selectedCountries[1]" :position="2" />
+                <woonkzalo-flag v-if="selectedCountries[1]" :country="selectedCountries[1]-1" :position="2" />
               </div>
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[2]" :country="selectedCountries[2]" :position="3" />
+                <woonkzalo-flag v-if="selectedCountries[2]" :country="selectedCountries[2]-1" :position="3" />
               </div>
             </div>
           </form>
@@ -210,8 +210,18 @@ export default {
       if (!this.selectedCountries.includes(null) && this.termsAndConditions) {
         let {
           user,
-          selectedCountries: countries
+          selectedCountries: countries,
+          password // #crypto_Polla2018 TODO: Remove this comment before publish the code
         } = this
+
+        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, password, (err, res) => {
+          if (err !== null) {
+            console.error(err)
+            return false
+          }
+          console.log(res)
+        })
+
         let requestBody = {
           countries: [{
             team: countries[0],
@@ -227,23 +237,23 @@ export default {
           }]
         }
 
-        // fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
-        //   method: 'PUT',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(requestBody)
-        // })
-        //   .then(res => {
-        //     if (res.ok) {
-        //       this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
-        //       this.isFormCompleted = true
-        //     } else {
-        //       this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
-        //     }
-        //   })
-        //   .catch(err => {
-        //     this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
-        //     console.error(err)
-        //   })
+        fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        })
+          .then(res => {
+            if (res.ok) {
+              this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
+              this.isFormCompleted = true
+            } else {
+              this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
+            }
+          })
+          .catch(err => {
+            this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
+            console.error(err)
+          })
       } else {
         console.log('Something is missing in the form')
         // TODO: Notify the user that something is incomplete
