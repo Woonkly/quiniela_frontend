@@ -113,6 +113,17 @@
         </div>
       </div>
 
+      <article v-if="txHash" class="message is-info">
+        <div class="message-header">
+          <p>Información de tu transacción</p>
+          <button @click="txHash = null" class="delete" aria-label="delete"></button>
+        </div>
+        <div class="message-body">
+          Su transacción fue enviada, puede revisar su estado en el siguiente link: <br>
+          <a :href="txUrl" target="_blank">{{txUrl}}</a>
+        </div>
+      </article>
+
       <div v-show="successMessage" class="columns">
         <div class="column column is-6-tablet mx-auto">
           <div v-show="successMessage" class="notification is-success">
@@ -133,6 +144,7 @@ import wCheckbox from '@/components/unit/WoonklyCheckbox'
 import countriesTable from '@/assets/countriesTable'
 import temporalCountriesArray from '@/assets/temporalResponse'
 import contractABI from '@/assets/contractAbi'
+import md5 from 'blueimp-md5/js/md5'
 
 let woonklyContract = null
 let localWeb3 = null
@@ -145,6 +157,7 @@ export default {
         name: null,
         account: null
       },
+      txHash: null,
       web3Validated: true,
       password: null,
       termsAndConditions: false,
@@ -163,6 +176,9 @@ export default {
   computed: {
     showForm () {
       return this.isUserAuth && this.termsAndConditions
+    },
+    txUrl () {
+      return `${process.env.ETHERSCAN_URL}/${this.txHash}`
     }
   },
   methods: {
@@ -174,8 +190,7 @@ export default {
       var woonklyContractAbi = localWeb3.eth.contract(contractABI)
       console.log(woonklyContractAbi)
 
-
-      woonklyContract = woonklyContractAbi.at('0xc342ec0D39adA78023B23F17bd6C7C3f655dee98')
+      woonklyContract = woonklyContractAbi.at(process.env.CONTRACT_ADDRESS)
 
       console.log(woonklyContract)
     },
@@ -214,12 +229,14 @@ export default {
           password // #crypto_Polla2018 TODO: Remove this comment before publish the code
         } = this
 
-        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, password, (err, res) => {
+        let passwordHash = md5(password)
+
+        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { value: 0.02 * 1E18, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
           if (err !== null) {
             console.error(err)
             return false
           }
-          console.log(res)
+          this.txHash = res
         })
 
         let requestBody = {
@@ -244,7 +261,7 @@ export default {
         })
           .then(res => {
             if (res.ok) {
-              this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
+              this.successMessage = 'Por favor revise que su transaccion se haya enviado. Sus equipos seleccionados se han guardado correctamente en nuestra base de datos.'
               this.isFormCompleted = true
             } else {
               this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
