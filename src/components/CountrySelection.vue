@@ -231,7 +231,7 @@ export default {
 
         let passwordHash = md5(password)
 
-        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { value: 0.02 * 1E18, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
+        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
           if (err !== null) {
             console.error(err)
             return false
