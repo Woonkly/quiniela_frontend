@@ -226,7 +226,7 @@ export default {
         let {
           user,
           selectedCountries: countries,
-          password // #crypto_Polla2018 TODO: Remove this comment before publish the code
+          password
         } = this
 
         let passwordHash = md5(password)
@@ -272,8 +272,7 @@ export default {
             console.error(err)
           })
       } else {
-        console.log('Something is missing in the form')
-        // TODO: Notify the user that something is incomplete
+        window.alert('Debe seleccionar tres paises e ingresar la contraseña súper secreta.')
       }
     }
   },
