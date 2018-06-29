@@ -19,18 +19,11 @@ export function web3PresentAndValidated (finishedValidation, setAccount) {
             console.error(err)
             finishedValidation(false)
           }
-          switch (netId) {
-            case '1':
-              console.log('The user is on the mainet')
-              // TODO: Once in production set the validation in this point
-              break
-            case '3':
-              console.log('ON ROPSTEN NETWORK')
-              finishedValidation(true)
-              break
-            default:
-              console.log('User not in mainet', `Network ID: ${netId}`)
-              finishedValidation(false)
+          if (netId === process.env.NETWORK_ID) {
+            finishedValidation(true)
+          } else {
+            console.error('The user is connected to a invalid ETH network')
+            finishedValidation(false)
           }
         })
       }
