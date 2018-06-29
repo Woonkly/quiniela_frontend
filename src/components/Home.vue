@@ -2,7 +2,7 @@
   <section id="woonkly-home" class="section text-center">
     <span class="title is-2">Gracias por interesarte en la Woonkly Quiniela, pronto se anunciarán a los ganadores.</span>
     <hr>
-    <img @click="toggleClass" :class="{'spinning': woonklySpinning}" src="/static/woonkzalo-big.png" alt="Woonkzalo">
+    <img style="margin-top:-20%;margin-bottom:-25%" @click="toggleClass" :class="{'spinning': woonklySpinning}" src="/static/woonkzalo-big.png" alt="Woonkzalo">
   </section>
 </template>
 
