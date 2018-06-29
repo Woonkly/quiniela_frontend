@@ -1,7 +1,7 @@
 import { web3PresentAndValidated } from '@/utils/web3Validator'
 import contractABI from '@/assets/contractAbi'
 
-export function verifyWeb3AndInstantiateContract (callback) {
+export function verifyWeb3AndInstantiateContract (callback, contractLoction) {
   let account
   // First parameter is the function to be executed when the validation ends
   // The second functions sets the user account
@@ -14,7 +14,7 @@ export function verifyWeb3AndInstantiateContract (callback) {
       localWeb3.eth.defaultAccount = account
       // declare woonkly contract ABI
       var woonklyContractAbi = localWeb3.eth.contract(contractABI)
-      var smartContractContainer = woonklyContractAbi.at('0xc342ec0D39adA78023B23F17bd6C7C3f655dee98')
+      var smartContractContainer = woonklyContractAbi.at(contractLoction)
       callback(smartContractContainer)
     }
   }, (acc) => { account = acc })
