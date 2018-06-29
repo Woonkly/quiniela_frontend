@@ -32,6 +32,18 @@
             <button @click="sendWinners" class="button is-link mx-auto" type="button">Seleccionar Ganadores ¡YA!</button>
           </div>
         </div>
+
+        <div v-if="confirmTransaction" class="column is-12-tablet is-6-desktop mx-auto">
+          <article class="message is-primary">
+            <div class="message-header">
+              <p>Revise Metamask</p>
+            </div>
+            <div class="message-body">
+              Por favor confirme su transacción, su voto será enviado junto con la transaccion que usted autorize.
+            </div>
+          </article>
+        </div>
+
         <div class="column is-12-tablet is-6-desktop mx-auto">
           <article class="message is-warning">
             <div class="message-header">
@@ -57,6 +69,7 @@ export default {
   name: 'WinnerSelection',
   data () {
     return {
+      confirmTransaction: false,
       trueSelectedPlayers: [],
       players: []
     }
@@ -80,7 +93,7 @@ export default {
     sendWinners () {
       let { trueSelectedPlayers: winners } = this
 
-      console.log('caca que estoy a punto de mandar al smartcontract:', winners)
+      this.confirmTransaction = true
 
       woonklySmartContract.setWinners(winners, (err, res) => {
         console.log(res)
@@ -116,7 +129,7 @@ export default {
     }
   },
   mounted () {
-    verifyWeb3AndInstantiateContract(this.requestParticipants)
+    verifyWeb3AndInstantiateContract(this.requestParticipants, process.env.CONTRACT_ADDRESS)
   }
 }
 </script>
