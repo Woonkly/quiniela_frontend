@@ -2,7 +2,6 @@
 const merge = require('webpack-merge')
 const prodEnv = require('./prod.env')
 
-// TODO: Change ehterscan url and contract address when production ready
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
   BASE_URL: '"http://localhost:8080"',
