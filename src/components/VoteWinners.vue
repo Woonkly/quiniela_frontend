@@ -93,7 +93,7 @@ export default {
   methods: {
     vote (veredict) {
       this.confirmTransaction = true
-      woonklySmartContract.vote(veredict, (err, res) => {
+      woonklySmartContract.vote(veredict, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
         if (err !== null) {
           console.error(err)
           return false
