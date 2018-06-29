@@ -5,7 +5,8 @@
         <div class="column is-12">
           <span class="title is-4">Indique si esta de acuerdo con la seleccion de los ganadores.</span>
         </div>
-        <div class="column is-12">
+
+        <div v-if="!txHash" class="column is-12">
           <table class="table mx-auto">
             <thead>
               <tr>
@@ -16,7 +17,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(winner, idx) in winners">
+              <tr v-for="winner in winners">
+                <td>{{winner.name}}</td>
+                <td>{{winner.firstPlace}}</td>
+                <td>{{winner.secondPlace}}</td>
+                <td>{{winner.thirdPlace}}</td>
               </tr>
             </tbody>
           </table>
@@ -25,7 +30,32 @@
             <button @click="vote(false)" class="button is-danger mx-auto" type="button">¡No, no merecen crypto!</button>
           </div>
         </div>
+
         <div class="column is-12-tablet is-6-desktop mx-auto">
+          <article v-if="txHash" class="message is-info">
+            <div class="message-header">
+              <p>Información de tu transacción</p>
+              <button @click="txHash = null" class="delete" aria-label="delete"></button>
+            </div>
+            <div class="message-body">
+              Su transacción fue enviada, puede revisar su estado en el siguiente link: <br>
+              <a :href="txUrl" target="_blank">{{txUrl}}</a>
+            </div>
+          </article>
+        </div>
+
+        <div v-if="confirmTransaction" class="column is-12-tablet is-6-desktop mx-auto">
+          <article class="message is-primary">
+            <div class="message-header">
+              <p>Revise su transacción</p>
+            </div>
+            <div class="message-body">
+              Por favor autorize su transacción, su voto será enviado junto con esa transacción.
+            </div>
+          </article>
+        </div>
+
+        <div v-if="!txHash" class="column is-12-tablet is-6-desktop mx-auto">
           <article class="message is-warning">
             <div class="message-header">
               <p>Atención</p>
@@ -50,20 +80,57 @@ export default {
   name: 'WinnerSelection',
   data () {
     return {
-      winners: []
+      confirmTransaction: false,
+      winners: [],
+      txHash: null
+    }
+  },
+  computed: {
+    txUrl () {
+      return `${process.env.ETHERSCAN_URL}/${this.txHash}`
     }
   },
   methods: {
     vote (veredict) {
-      if (veredict) console.log('Punto a favor')
-      else console.log('Usuario berrinchudo')
+      this.confirmTransaction = true
+      woonklySmartContract.vote(veredict, (err, res) => {
+        if (err !== null) {
+          console.error(err)
+          return false
+        }
+        this.confirmTransaction = false
+        this.txHash = res
+      })
     },
     requestWinner (contractInstance) {
-      // TODO: Do something
+      woonklySmartContract = contractInstance
+
+      woonklySmartContract.winnersLength((err, res) => {
+        if (err !== null) {
+          console.error(err)
+          return false
+        }
+        for (let i = 0; i < res.c[0]; i++) {
+          woonklySmartContract.winners(i, (err2, res2) => {
+            woonklySmartContract.users(res2, (err3, res3) => {
+              // Finally, the "users" function return the data asociated with that player
+              this.winners.push({
+                firstPlace: countriesArray[res3[1].c[0]-1],
+                secondPlace: countriesArray[res3[2].c[0]-1],
+                thirdPlace: countriesArray[res3[3].c[0]-1],
+                name: res3[4],
+                address: res2
+              })
+            })
+          })
+        }
+      })
+
+      console.log(woonklySmartContract)
     }
   },
   mounted () {
-    // verifyWeb3AndInstantiateContract(this.requestWinner)
+    verifyWeb3AndInstantiateContract(this.requestWinner, process.env.CONTRACT_ADDRESS)
   }
 }
 </script>
