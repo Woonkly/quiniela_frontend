@@ -1,6 +1,6 @@
-# woonkly-quiniela
-
-> Quiniela del mundial para Woonkly
+# Woonkly Soccer pool
+The main purpose of this project is to act like an interface between the users who want to gamble on the FIFA &copy; World Cup 2018 and the Woonkly Soccer pool smart contract on the ethereum network and get the chance to win an incredible amount of WOONKS (The official Woonkly token).
+___
 
 ## Build Setup
 

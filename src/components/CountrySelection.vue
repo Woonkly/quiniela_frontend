@@ -57,7 +57,7 @@
                 <div class="select">
                   <select v-model="selectedCountries[0]">
                     <option value="null" disabled selected>Primer lugar</option>
-                    <option v-for="c in countriesArray" :key="c" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                    <option v-for="c in contriesCodes" :key="c.country" :disabled="selectedCountries.includes(c.number)" :value="c.number">{{mappedCountries[c.country]}}</option>
                   </select>
                 </div>
               </div>
@@ -68,7 +68,7 @@
                 <div class="select">
                   <select v-model="selectedCountries[1]">
                     <option value="null" disabled selected>Segundo lugar</option>
-                    <option v-for="c in countriesArray" :key="c" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                    <option v-for="c in contriesCodes" :key="c.country" :disabled="selectedCountries.includes(c.number)" :value="c.number">{{mappedCountries[c.country]}}</option>
                   </select>
                 </div>
               </div>
@@ -79,27 +79,11 @@
                 <div class="select">
                   <select v-model="selectedCountries[2]">
                     <option value="null" disabled selected>Tercer lugar</option>
-                    <option v-for="c in countriesArray" :key="c" :disabled="selectedCountries.includes(c)">{{c}}</option>
+                    <option v-for="c in contriesCodes" :key="c.country" :disabled="selectedCountries.includes(c.number)" :value="c.number">{{mappedCountries[c.country]}}</option>
                   </select>
                 </div>
               </div>
             </div>
-
-            <!-- <div class="field">
-              <label class="label">Message</label>
-              <div class="control">
-                <textarea class="textarea" placeholder="Textarea"></textarea>
-              </div>
-            </div> -->
-
-            <!-- <div class="field">
-              <div class="control">
-                <label class="checkbox">
-                  <input type="checkbox" v-model="termsAndConditions">
-                  Acepto los <a href="#">términos y condiciones.</a>
-                </label>
-              </div>
-            </div> -->
 
             <div class="buttons">
               <button class="button w-100 is-link is-marginless is-block">Enviar</button>
@@ -107,13 +91,13 @@
 
             <div class="columns is-mobile">
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[0]" :country="countriesArray.indexOf(selectedCountries[0])" :position="1" />
+                <woonkzalo-flag v-if="selectedCountries[0]" :country="selectedCountries[0]-1" :position="1" />
               </div>
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[1]" :country="countriesArray.indexOf(selectedCountries[1])" :position="2" />
+                <woonkzalo-flag v-if="selectedCountries[1]" :country="selectedCountries[1]-1" :position="2" />
               </div>
               <div class="column is-4">
-                <woonkzalo-flag v-if="selectedCountries[2]" :country="countriesArray.indexOf(selectedCountries[2])" :position="3" />
+                <woonkzalo-flag v-if="selectedCountries[2]" :country="selectedCountries[2]-1" :position="3" />
               </div>
             </div>
           </form>
@@ -129,6 +113,17 @@
         </div>
       </div>
 
+      <article v-if="txHash" class="message is-info">
+        <div class="message-header">
+          <p>Información de tu transacción</p>
+          <button @click="txHash = null" class="delete" aria-label="delete"></button>
+        </div>
+        <div class="message-body">
+          Su transacción fue enviada, puede revisar su estado en el siguiente link: <br>
+          <a :href="txUrl" target="_blank">{{txUrl}}</a>
+        </div>
+      </article>
+
       <div v-show="successMessage" class="columns">
         <div class="column column is-6-tablet mx-auto">
           <div v-show="successMessage" class="notification is-success">
@@ -143,16 +138,27 @@
 </template>
 
 <script>
+import { web3PresentAndValidated } from '@/utils/web3Validator'
 import woonkzaloFlag from '@/components/unit/WoonkzaloFlag'
 import wCheckbox from '@/components/unit/WoonklyCheckbox'
+import countriesTable from '@/assets/countriesTable'
+import temporalCountriesArray from '@/assets/temporalResponse'
+import contractABI from '@/assets/contractAbi'
+import md5 from 'blueimp-md5/js/md5'
+
+let woonklyContract = null
+let localWeb3 = null
 
 export default {
   name: 'CountrySelection',
   data () {
     return {
       user: {
-        name: null
+        name: null,
+        account: null
       },
+      txHash: null,
+      web3Validated: true,
       password: null,
       termsAndConditions: false,
       isUserAuth: false,
@@ -162,15 +168,32 @@ export default {
       selectedCountries: [
         null, null, null
       ],
+      contriesCodes: temporalCountriesArray,
+      mappedCountries: countriesTable,
       countriesArray: 'ALEMANIA,ARABIA SAUDÍ,ARGENTINA,AUSTRALIA,BÉLGICA,BRASIL,COLOMBIA,COSTA RICA,CROACIA,DINAMARCA,EGIPTO,ESPAÑA,FRANCIA,INGLATERRA,ISLANDIA,JAPÓN,MARRUECOS,MÉXICO,NIGERIA,PANAMÁ,PERÚ,POLONIA,PORTUGAL,REPÚBLICA DE COREA,RI DE IRÁN,RUSIA,SENEGAL,SERBIA,SUECIA,SUIZA,TÚNEZ,URUGUAY'.split(',')
     }
   },
   computed: {
     showForm () {
       return this.isUserAuth && this.termsAndConditions
+    },
+    txUrl () {
+      return `${process.env.ETHERSCAN_URL}/${this.txHash}`
     }
   },
   methods: {
+    createContractInstance () {
+      localWeb3 = new Web3(window.web3.currentProvider)
+      localWeb3.eth.defaultAccount = this.user.account
+
+      // declare woonkly contract ABI
+      var woonklyContractAbi = localWeb3.eth.contract(contractABI)
+      console.log(woonklyContractAbi)
+
+      woonklyContract = woonklyContractAbi.at(process.env.CONTRACT_ADDRESS)
+
+      console.log(woonklyContract)
+    },
     fetchUser () {
       fetch(`${process.env.BASE_URL}/api/user/${this.$route.params.hash}`, {
         method: 'GET'
@@ -189,12 +212,33 @@ export default {
           console.error(error)
         })
     },
+    fetchCountries () {
+      fetch(`${process.env.BASE_URL}/api/equipos`, {
+        method: 'GET'
+      })
+        .then(res => res.json())
+        .then(json => {
+          this.contriesCodes = json
+        })
+    },
     submitForm (e) {
       if (!this.selectedCountries.includes(null) && this.termsAndConditions) {
         let {
           user,
-          selectedCountries: countries
+          selectedCountries: countries,
+          password
         } = this
+
+        let passwordHash = md5(password)
+
+        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
+          if (err !== null) {
+            console.error(err)
+            return false
+          }
+          this.txHash = res
+        })
+
         let requestBody = {
           countries: [{
             team: countries[0],
@@ -209,6 +253,7 @@ export default {
             place: 3
           }]
         }
+
         fetch(`${process.env.BASE_URL}/api/user/${user._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -216,7 +261,7 @@ export default {
         })
           .then(res => {
             if (res.ok) {
-              this.successMessage = 'Sus equipos seleccionados se han guardado correctamente.'
+              this.successMessage = 'Por favor revise que su transaccion se haya enviado. Sus equipos seleccionados se han guardado correctamente en nuestra base de datos.'
               this.isFormCompleted = true
             } else {
               this.errorMsg = 'Ha ocurrido un error a la hora de guardar sus equipos, por favor intentelo más tarde.'
@@ -227,8 +272,7 @@ export default {
             console.error(err)
           })
       } else {
-        console.log('Something is missing in the form')
-        // TODO: Notify the user that something is incomplete
+        window.alert('Debe seleccionar tres paises e ingresar la contraseña súper secreta.')
       }
     }
   },
@@ -238,6 +282,15 @@ export default {
   },
   mounted () {
     this.fetchUser()
+    web3PresentAndValidated((res) => {
+      if (!res) { this.web3Validated = false }
+      else {
+        this.createContractInstance()
+      }
+    },
+    (acc) => {
+      this.user.account = acc
+    })
   }
 }
 </script>

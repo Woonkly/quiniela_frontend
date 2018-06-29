@@ -46,6 +46,14 @@ export default {
 }
 
 // Helper classes
+.text-capitalize {
+  text-transform: capitalize; 
+}
+
+.text-center {
+  text-align: center;
+}
+
 .c-pointer {
   cursor: pointer !important;
 }
