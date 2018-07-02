@@ -1,7 +1,7 @@
 export function web3PresentAndValidated (finishedValidation, setAccount) {
   if (!window.web3) {
     finishedValidation(false)
-    console.log('Please install metamask or use mist')
+    window.alert('Por favor instale Metamask o use Mist')
     return false
   } else {
     window.web3.eth.getAccounts((err, acc) => {
