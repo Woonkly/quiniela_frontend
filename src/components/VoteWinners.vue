@@ -31,6 +31,8 @@
           </div>
         </div>
 
+        <div class="column is-12"></div>
+
         <div class="column is-12-tablet is-6-desktop mx-auto">
           <article v-if="txHash" class="message is-info">
             <div class="message-header">
@@ -44,6 +46,8 @@
           </article>
         </div>
 
+        <div class="column is-12"></div>
+
         <div v-if="confirmTransaction" class="column is-12-tablet is-6-desktop mx-auto">
           <article class="message is-primary">
             <div class="message-header">
@@ -54,6 +58,8 @@
             </div>
           </article>
         </div>
+
+        <div class="column is-12"></div>
 
         <div v-if="!txHash" class="column is-12-tablet is-6-desktop mx-auto">
           <article class="message is-warning">
