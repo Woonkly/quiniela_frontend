@@ -14,7 +14,12 @@ export function verifyWeb3AndInstantiateContract (callback, contractLoction) {
       localWeb3.eth.defaultAccount = account
       // declare woonkly contract ABI
       var woonklyContractAbi = localWeb3.eth.contract(contractABI)
-      var smartContractContainer = woonklyContractAbi.at(contractLoction)
+
+      var smartContractContainer
+      if (contractLoction) {
+        smartContractContainer = woonklyContractAbi.at(contractLoction)
+      }
+
       callback(smartContractContainer)
     }
   }, (acc) => { account = acc })
