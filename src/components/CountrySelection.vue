@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { web3PresentAndValidated } from '@/utils/web3Validator'
+import { verifyWeb3AndInstantiateContract } from '@/utils/smartContractUtils'
 import woonkzaloFlag from '@/components/unit/WoonkzaloFlag'
 import wCheckbox from '@/components/unit/WoonklyCheckbox'
 import countriesTable from '@/assets/countriesTable'
@@ -146,8 +146,7 @@ import temporalCountriesArray from '@/assets/temporalResponse'
 import contractABI from '@/assets/contractAbi'
 import md5 from 'blueimp-md5/js/md5'
 
-let woonklyContract = null
-let localWeb3 = null
+let woonklyContract
 
 export default {
   name: 'CountrySelection',
@@ -182,17 +181,21 @@ export default {
     }
   },
   methods: {
-    createContractInstance () {
-      localWeb3 = new Web3(window.web3.currentProvider)
-      localWeb3.eth.defaultAccount = this.user.account
-
-      // declare woonkly contract ABI
-      var woonklyContractAbi = localWeb3.eth.contract(contractABI)
-      console.log(woonklyContractAbi)
-
-      woonklyContract = woonklyContractAbi.at(process.env.CONTRACT_ADDRESS)
-
-      console.log(woonklyContract)
+    // createContractInstance () {
+    //   localWeb3 = new Web3(window.web3.currentProvider)
+    //   localWeb3.eth.defaultAccount = this.user.account
+    //
+    //   // declare woonkly contract ABI
+    //   var woonklyContractAbi = localWeb3.eth.contract(contractABI)
+    //   console.log(woonklyContractAbi)
+    //
+    //   woonklyContract = woonklyContractAbi.at(process.env.CONTRACT_ADDRESS)
+    //
+    //   console.log(woonklyContract)
+    // },
+    saveContractInstance (contractInstance) {
+      woonklyContract = contractInstance
+      console.log(contractInstance)
     },
     fetchUser () {
       fetch(`${process.env.BASE_URL}/api/user/${this.$route.params.hash}`, {
@@ -231,7 +234,8 @@ export default {
 
         let passwordHash = md5(password)
 
-        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
+        // TODO: See why process is undefined
+        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { gasPrice: 10 * 1E9 }, (err, res) => {
           if (err !== null) {
             console.error(err)
             return false
@@ -282,15 +286,16 @@ export default {
   },
   mounted () {
     this.fetchUser()
-    web3PresentAndValidated((res) => {
-      if (!res) { this.web3Validated = false }
-      else {
-        this.createContractInstance()
-      }
-    },
-    (acc) => {
-      this.user.account = acc
-    })
+    verifyWeb3AndInstantiateContract(this.saveContractInstance, process.env.CONTRACT_ADDRESS)
+    // web3PresentAndValidated((res) => {
+    //   if (!res) { this.web3Validated = false }
+    //   else {
+    //     this.createContractInstance()
+    //   }
+    // },
+    // (acc) => {
+    //   this.user.account = acc
+    // })
   }
 }
 </script>
