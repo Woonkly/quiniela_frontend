@@ -1,17 +1,40 @@
 <template>
   <div id="app">
     <wnk-header />
+
+    <article v-if="!isMetamaskInstalled" style="max-width:500px;padding-top:1.5em" class="message is-danger mx-auto">
+      <div class="message-header">
+        <p>Atención</p>
+        <!-- <button class="delete" aria-label="delete"></button> -->
+      </div>
+      <div class="message-body">
+        <strong class="title is-2">Por favor instale Metamask. Una vez que lo haya instalado, inicie sesión y recargue el navegador.</strong>
+      </div>
+    </article>
+    <!-- Metamask warning -->
+
     <router-view/>
   </div>
 </template>
 
 <script>
+import { web3PresentAndValidated } from '@/utils/web3Validator'
 import wnkHeader from '@/components/Header'
 
 export default {
   name: 'App',
+  data () {
+    return {
+      isMetamaskInstalled: false
+    }
+  },
   components: {
     wnkHeader
+  },
+  mounted () {
+    web3PresentAndValidated((res) => {
+      this.isMetamaskInstalled = res
+    })
   }
 }
 </script>
