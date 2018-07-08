@@ -2,6 +2,13 @@ import { web3PresentAndValidated } from '@/utils/web3Validator'
 import contractABI from '@/assets/contractAbi'
 import countriesArray from '@/assets/countriesArray'
 
+var validateError = function (err) {
+  if (err !== null) {
+    console.error(err)
+    return false
+  }
+}
+
 export function verifyWeb3AndInstantiateContract (callback, contractLoction) {
   let account
   // First parameter is the function to be executed when the validation ends
@@ -29,25 +36,27 @@ export function verifyWeb3AndInstantiateContract (callback, contractLoction) {
 // This function initialize smart contract and get the current players from it
 export function requestPoolPlayers (address, players) {
   verifyWeb3AndInstantiateContract((woonklySmartContract) => {
-    woonklySmartContract.winnersLength((err, res) => {
-      if (err !== null) {
-        console.error(err)
-        return false
-      }
+    woonklySmartContract.playersLength((err, res) => {
+      if (validateError(err)) return false
+      // For each player on the pool we call the "players" function
       for (let i = 0; i < res.c[0]; i++) {
-        woonklySmartContract.winners(i, (err2, res2) => {
-          woonklySmartContract.users(res2, (err3, res3) => {
+        woonklySmartContract.players(i, (err1, res) => {
+          if (validateError(err1)) return false
+          // The "players" function return us the address wich is used to call the "users function"
+          woonklySmartContract.users(res, (err2, res2) => {
+            if (validateError(err2)) return false
             // Finally, the "users" function return the data asociated with that player
-            players.push({
-              firstPlace: countriesArray[res3[1].c[0]-1],
-              secondPlace: countriesArray[res3[2].c[0]-1],
-              thirdPlace: countriesArray[res3[3].c[0]-1],
-              name: res3[4],
-              address: res2
-            })
+            var player = {
+              firstPlace: countriesArray[res2[1].c[0] - 1],
+              secondPlace: countriesArray[res2[2].c[0] - 1],
+              thirdPlace: countriesArray[res2[3].c[0] - 1],
+              name: res2[4]
+            }
+            // Just some data format and push onto the players array
+            players.push(player)
           })
         })
-      }
+      } // for loop
     })
   }, address)
 }
