@@ -131,8 +131,6 @@ export default {
           })
         }
       })
-
-      console.log(woonklySmartContract)
     }
   },
   mounted () {
