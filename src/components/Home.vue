@@ -7,11 +7,14 @@
 </template>
 
 <script>
+import { requestPoolPlayers } from '@/utils/smartContractUtils'
+
 export default {
   name: 'WoonklyHome',
   data () {
     return {
-      woonklySpinning: false
+      woonklySpinning: false,
+      players: []
     }
   },
   methods: {
@@ -21,6 +24,9 @@ export default {
         setTimeout(() => this.woonklySpinning = false, 650)
       }
     }
+  },
+  mounted () {
+    requestPoolPlayers(process.env.CONTRACT_ADDRESS, this.players)
   }
 }
 </script>
