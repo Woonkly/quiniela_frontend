@@ -95,7 +95,7 @@
               <p>Atención</p>
             </div>
             <div class="message-body">
-              <strong>Señor Santos</strong>, por favor sea cuidadoso por que esta operacion solo se puede realizar una <i><strong><abbr title="No se puede deshacer">ÚNICA</abbr></strong></i> vez.
+              <strong>Por favor</strong>, sea cuidadoso por que esta operacion solo se puede realizar una <i><strong><abbr title="No se puede deshacer">ÚNICA</abbr></strong></i> vez.
             </div>
           </article>
         </div>
@@ -134,7 +134,8 @@ export default {
 
       // else
       return this.trueSelectedPlayers.reduce((acc, el) => {
-        return acc += parseFloat(this.eth[el])
+        if (parseFloat(this.eth[el])) return acc += parseFloat(this.eth[el])
+        else return acc + 0
       }, 0)
     },
     remainingFromContract () {
@@ -156,7 +157,9 @@ export default {
   },
   methods: {
     addZero (address) {
-      this.eth[address] = 0.1
+      if (!parseInt(this.eth[address])) {
+        this.eth[address] = 0.1
+      }
     },
     sendWinners () {
       let { trueSelectedPlayers: winners } = this
@@ -164,19 +167,33 @@ export default {
       let addressesArray = []
       let ethArray = []
 
+      let sendTransaction = false
+
       winners.forEach(key => {
         if (key in this.eth) {
-          addressesArray.push(key)
-          ethArray.push(this.eth[key])
+          if (!parseFloat(this.eth[key])) {
+            sendTransaction = false 
+            window.alert('No se puede enviar ganadores con 0 ETH')
+          } else {
+            sendTransaction = true
+            addressesArray.push(key)
+            ethArray.push(this.eth[key] * 1E18)
+          }
         }
       })
 
       this.confirmTransaction = true
 
-      woonklySmartContract.setWinners(addressesArray, ethArray, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
-        this.confirmTransaction = true
-        this.txHash = res
-      })
+      if (sendTransaction) {
+        console.log(addressesArray, ethArray)
+        woonklySmartContract.setWinners(addressesArray, ethArray, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
+          this.confirmTransaction = true
+          this.txHash = res
+        })
+      } else {
+        window.alert('Por favor seleccione al menos UN ganador')
+      }
+      
     },
     requestParticipants (contractInstance) {
       woonklySmartContract = contractInstance
