@@ -11,13 +11,13 @@
                 <h5 class="title is-5 has-text-centered">---- Woonkly WC 2018 ----</h5>
                 <ul>
                   <li>
-                    <strong>Puede existir más de un ganador.</strong>
+                    <strong>Solo habrá un ganador.</strong>
                   </li>
                   <li>
-                    <strong>El premio se reparte cuando más del 50% de los participantes esté de acuerdo</strong>
+                    <strong>El premio se reparte en cuanto se sepa el ganador.</strong>
                   </li>
                   <li>
-                    <strong>La cantidad a apostar se fijó anteriormente por los que los montos para los posibles ganadores ya fueron acordados.</strong>
+                    <strong>La cantidad para el ganador se acordó previamente.</strong>
                   </li>
                 </ul>
               </div>

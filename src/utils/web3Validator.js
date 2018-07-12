@@ -25,6 +25,7 @@ export function web3PresentAndValidated (finishedValidation, setAccount) {
           if (netId === process.env.NETWORK_ID) {
             finishedValidation(true)
           } else {
+            window.alert('Por favor conectece a la mainet de Ethereum')
             console.error('The user is connected to a invalid ETH network')
             finishedValidation(false)
           }
