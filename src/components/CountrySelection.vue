@@ -233,9 +233,8 @@ export default {
         } = this
 
         let passwordHash = md5(password)
-
         // TODO: See why process is undefined
-        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { gasPrice: 10 * 1E9 }, (err, res) => {
+        woonklyContract.addUser(countries[0], countries[1], countries[2], user.name, passwordHash, { gasPrice: 10 * 1E9, value: window.web3.toWei('0.2', "ether") }, (err, res) => {
           if (err !== null) {
             console.error(err)
             return false

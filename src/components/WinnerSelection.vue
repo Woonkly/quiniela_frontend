@@ -167,12 +167,12 @@ export default {
       winners.forEach(key => {
         if (key in this.eth) {
           addressesArray.push(key)
-          ethArray.push(this.eth[key])
+          // ethArray.push(this.eth[key])
+          ethArray.push(window.web3.toWei(this.eth[key], "ether"))
         }
       })
 
       this.confirmTransaction = true
-
       woonklySmartContract.setWinners(addressesArray, ethArray, { value: 0, to: process.env.CONTRACT_ADDRESS, gasPrice: 10 * 1E9 }, (err, res) => {
         this.confirmTransaction = true
         this.txHash = res
