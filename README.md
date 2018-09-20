@@ -1,5 +1,5 @@
 # Quiniela World Cup - frontend
-[![Woonkly](https://woonkly.com/img/powered_woonkly.png)](https://woonkly.com)
+[![Woonkly](https://woonkly.com/img/email-assets/powered-by.png)](https://woonkly.com)
 
 The main purpose of this project is to act like an interface between the users who want to gamble on the FIFA &copy; World Cup 2018 and the Woonkly Soccer pool smart contract on the ethereum network and get the chance to win ETH.
 
@@ -22,7 +22,7 @@ $npm run build
 ## Changing the project´s configuration.
 If you want to change the project´s basic configuration all you need to do is to go to the _config_ directory and modify the _dev.env.js_ file. In this file, you can type your own settings.
 For example:
-``` bash
+``` javascript
 module.exports = merge(prodEnv, {
   //the enviroment.
   NODE_ENV: '"development"',
@@ -45,7 +45,7 @@ module.exports = merge(prodEnv, {
 ```
 Maybe you will need to also make changes in the _prod.env.js_ file:
 For example:
-```bash
+```javascript
 module.exports = {
     //the enviroment.
     NODE_ENV: '"production"',
@@ -87,8 +87,8 @@ This project uses [Vue CLI](https://github.com/vuejs/vue-cli) v2.9.6.
 
 In order to user this project, you need start the project with:
 ``` bash
-$npm install
-$npm start
+$ npm install
+$ npm start
 ```
 Now your project is running in http://localhost:8081
 
